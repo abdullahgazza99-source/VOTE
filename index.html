@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIVE VOTING RANKING - Live Race Arena</title>
+    <!-- Web App Manifest for Offline PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#080c14">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=180&h=180&fit=crop">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -45,6 +50,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         body {
             font-family: 'Rajdhani', 'Inter', sans-serif;
@@ -54,7 +60,6 @@
             user-select: none;
         }
 
-        /* Cyber grid background */
         .bg-cyber-grid {
             background-size: 36px 36px;
             background-image: 
@@ -62,54 +67,56 @@
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
 
-        /* Glassmorphism panel */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Race Track Styles */
+        /* Animated Re-ranking Smooth Lane Transition */
+        .race-lane-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+        }
+
         .race-lane {
             position: relative;
-            background: rgba(15, 23, 42, 0.7);
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-            transition: all 0.5s ease;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.6s cubic-bezier(0.34, 1.25, 0.64, 1), background-color 0.4s ease;
+            will-change: transform;
         }
 
-        .race-lane:last-child {
-            border-bottom: none;
-        }
-
-        /* Smooth animated node on track */
+        /* Avatar Node Smooth Interpolation */
         .race-avatar-node {
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
-            transition: left 0.8s cubic-bezier(0.34, 1.3, 0.64, 1), top 0.6s ease;
-            will-change: left, top;
-            z-index: 20;
+            transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: left;
+            z-index: 25;
         }
 
-        .race-trail-line {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            height: 4px;
-            transform: translateY(-50%);
-            border-radius: 9999px;
-            transition: width 0.8s cubic-bezier(0.34, 1.3, 0.64, 1);
-            opacity: 0.85;
+        /* Animated Wavy Trail Path CSS */
+        .animated-wavy-path {
+            stroke-dasharray: 20 10;
+            animation: waveFlow 1.2s linear infinite;
         }
 
-        /* Number ticker bump effect */
+        @keyframes waveFlow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -60; }
+        }
+
         .number-bump {
             animation: bump 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes bump {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); color: #38bdf8; }
+            50% { transform: scale(1.15); color: #38bdf8; }
             100% { transform: scale(1); }
         }
 
@@ -118,12 +125,6 @@
         ::-webkit-scrollbar-track { background: #080c14; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-        /* Themes */
-        body.theme-sport { background-color: #0b1329; }
-        body.theme-minimal { background-color: #121212; }
-        body.theme-game { background-color: #0e081e; }
-
-        /* Pulse glow animation */
         .timer-warning {
             animation: pulse-red 1s infinite alternate;
         }
@@ -132,20 +133,13 @@
             from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.6); }
             to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); border-color: rgba(239, 68, 68, 1); }
         }
-
-        @media (prefers-reduced-motion: reduce) {
-            .race-avatar-node, .race-trail-line, .number-bump {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
     </style>
 </head>
-<body class="bg-cyber-grid min-h-screen text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-black p-2 sm:p-4">
+<body class="bg-cyber-grid min-h-screen text-slate-100 flex flex-col justify-between p-2 sm:p-4">
 
     <!-- Top Action Navigation Bar -->
     <header class="glass-panel rounded-2xl px-4 py-2.5 shadow-lg mb-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
             <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shadow-glow-green">
                     <i data-lucide="flag" class="w-4 h-4"></i>
@@ -154,14 +148,24 @@
                     <h1 class="text-base font-extrabold tracking-wider uppercase bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
                         Live Race Voting
                     </h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Arena Balapan Real-time</span>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Arena Balapan Auto-Rank</span>
                 </div>
             </div>
 
+            <!-- Race Mode Switcher (Manual / Otomatis) -->
             <div class="flex items-center gap-2">
-                <!-- Direct Vote Amount Selector Indicator -->
+                <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs">
+                    <button id="btn-mode-manual" onclick="setRaceMode('manual')" class="px-3 py-1 rounded-lg font-bold uppercase transition text-emerald-400 bg-slate-800 shadow">
+                        🎮 Manual
+                    </button>
+                    <button id="btn-mode-auto" onclick="setRaceMode('auto')" class="px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white">
+                        🤖 Otomatis
+                    </button>
+                </div>
+
+                <!-- Direct Vote Increment Selector -->
                 <div class="hidden md:flex items-center gap-1 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs">
-                    <span class="text-slate-400 font-bold uppercase text-[10px]">Nilai Klik Vote:</span>
+                    <span class="text-slate-400 font-bold uppercase text-[10px]">Klik Vote:</span>
                     <select id="header-vote-increment" onchange="updateVoteIncrement(this.value)" class="bg-slate-800 text-emerald-400 font-mono font-bold rounded px-1.5 py-0.5 border border-slate-700 focus:outline-none text-xs">
                         <option value="1">+1</option>
                         <option value="10">+10</option>
@@ -172,33 +176,27 @@
                     </select>
                 </div>
 
-                <!-- Toggle Mode Presentasi -->
-                <button id="btn-presentation-mode" onclick="togglePresentationMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition hover:text-white active:scale-95 shadow-md">
-                    <i data-lucide="tv" class="w-3.5 h-3.5 text-cyan-400"></i>
-                    <span class="hidden sm:inline">Mode Presentasi</span>
+                <!-- Modal Controls -->
+                <button onclick="togglePresentationMode()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition shadow-md" title="Mode Fullscreen / Presentasi">
+                    <i data-lucide="tv" class="w-4 h-4 text-cyan-400"></i>
                 </button>
 
-                <!-- Setup Event Modal Toggle -->
-                <button id="btn-open-settings" onclick="openModal('settings-modal')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider transition shadow-lg shadow-emerald-950/50 active:scale-95">
+                <button onclick="openModal('settings-modal')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider transition shadow-lg shadow-emerald-950/50 active:scale-95">
                     <i data-lucide="settings" class="w-3.5 h-3.5"></i>
-                    <span>Pengaturan</span>
+                    <span class="hidden sm:inline">Pengaturan</span>
                 </button>
 
-                <!-- Manual Winner Force Trigger Button -->
-                <button onclick="finishVotingWinner()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition active:scale-95 flex items-center gap-1" title="Akhiri & Umumkan Pemenang">
-                    <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-400"></i>
-                    <span class="hidden md:inline">Akhiri</span>
+                <button onclick="finishVotingWinner()" class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition active:scale-95" title="Akhiri Balapan">
+                    <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
                 </button>
 
-                <!-- Reset Button -->
-                <button onclick="openModal('reset-modal')" class="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition active:scale-95" title="Reset Voting">
-                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <button onclick="openModal('reset-modal')" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition active:scale-95" title="Reset Voting">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN COMPACT CONTAINER -->
     <main class="max-w-7xl w-full mx-auto flex-grow flex flex-col gap-3 justify-center">
 
         <!-- COMPACT HEADER EVENT BANNER -->
@@ -208,7 +206,6 @@
 
             <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-3 px-2">
                 
-                <!-- Left: Event Logo & Title -->
                 <div class="flex items-center gap-3">
                     <div class="relative group">
                         <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1 bg-slate-900/90 border border-emerald-500/50 shadow-glow-green flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
@@ -219,15 +216,18 @@
                         <h2 id="display-event-title" class="text-xl sm:text-3xl font-black tracking-tight text-white uppercase leading-tight drop-shadow-md">
                             BALLON D'OR 2026
                         </h2>
-                        <p id="display-event-subtitle" class="text-[11px] sm:text-xs font-semibold text-emerald-400 tracking-widest uppercase">
-                            Live Race Fan Voting Arena
-                        </p>
+                        <div class="flex items-center gap-2">
+                            <p id="display-event-subtitle" class="text-[11px] sm:text-xs font-semibold text-emerald-400 tracking-widest uppercase">
+                                Live Race Fan Voting Arena
+                            </p>
+                            <span id="badge-auto-mode" class="hidden px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-mono text-[9px] font-bold animate-pulse">
+                                LIVE
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right: Countdown Timer & Total Votes Badges -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <!-- COUNTDOWN TIMER BADGE -->
                     <div id="timer-card-box" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-900/90 border border-cyan-500/40 flex items-center gap-2 shadow-inner transition-all">
                         <i data-lucide="timer" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
                         <div class="text-left">
@@ -238,7 +238,6 @@
                         </div>
                     </div>
 
-                    <!-- TOTAL VOTES BADGE -->
                     <div class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 flex items-center gap-2 shadow-inner">
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                         <div class="text-left">
@@ -253,39 +252,26 @@
             </div>
         </section>
 
-        <!-- LIVE RACE TRACK ARENA (MAIN HIGHLIGHT) -->
+        <!-- LIVE RACE TRACK ARENA -->
         <section class="glass-panel rounded-2xl p-4 border border-slate-700/80 shadow-2xl overflow-hidden relative">
             
             <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
                 <div class="flex items-center gap-2">
                     <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
                     <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-white">
-                        Live (Klik gift untuk  Vote)
+                        Live Top Rangking
                     </h3>
-                </div>
-                
-                <!-- Mobile vote increment selector -->
-                <div class="flex md:hidden items-center gap-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase">Klik:</span>
-                    <select onchange="updateVoteIncrement(this.value)" class="bg-slate-900 text-emerald-400 font-mono text-xs font-bold rounded px-1 py-0.5 border border-slate-700">
-                        <option value="1">+1</option>
-                        <option value="10">+10</option>
-                        <option value="50">+50</option>
-                        <option value="100" selected>+100</option>
-                        <option value="500">+500</option>
-                        <option value="1000">+1K</option>
-                    </select>
                 </div>
 
                 <div class="hidden sm:flex items-center gap-3 text-[11px] font-bold text-slate-400">
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Garis Start (0%)</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Pemimpin Finish</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> #1 Paling Atas</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ekor Bergelombang</span>
                 </div>
             </div>
 
             <!-- RACE TRACK CONTAINER -->
             <div class="relative w-full bg-slate-950/90 rounded-xl p-3 border border-slate-800/80 min-h-[360px] flex flex-col justify-around overflow-hidden">
-                <!-- Track Start & Finish Grid Overlay Lines -->
+                <!-- Grid Lines -->
                 <div class="absolute inset-y-0 left-36 sm:left-40 w-0.5 bg-emerald-500/40 z-10 border-r border-dashed border-emerald-400/60" title="Start Line"></div>
                 <div class="absolute inset-y-0 right-10 w-1 bg-amber-500/50 z-10 border-r-2 border-dashed border-amber-400" title="Finish Line"></div>
 
@@ -297,15 +283,15 @@
                     <div class="h-full border-r border-slate-400"></div>
                 </div>
 
-                <!-- RACE LANES (Generated Dynamically) -->
-                <div id="race-lanes-container" class="relative w-full h-full flex flex-col justify-around gap-3 z-20 py-1">
-                    <!-- Dynamic Race Lanes with Round Node Avatars -->
+                <!-- AUTO-RANK SORTED RACE LANES -->
+                <div id="race-lanes-container" class="race-lane-container z-20 py-1">
+                    <!-- Dynamic Lanes Shift Automatically -->
                 </div>
             </div>
             
             <p class="text-[11px] text-slate-400 font-semibold text-center mt-2.5 tracking-wide flex items-center justify-center gap-1">
-                <span>⚡</span>
-                <span>Klik tombol nomor berwarna di sebelah kiri nama peserta untuk mengirim vote langsung!</span>
+                <span></span>
+                <span></span>
             </p>
         </section>
 
@@ -325,15 +311,13 @@
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="relative z-10 flex flex-col items-center">
-                <!-- Golden Crown Icon -->
                 <div class="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-glow-gold mb-2 animate-bounce">
                     <i data-lucide="crown" class="w-9 h-9 fill-amber-400"></i>
                 </div>
 
-                <div class="text-xs font-black tracking-widest text-amber-400 uppercase">PEMENANG VOTING BALAPAN!</div>
-                <h3 class="text-2xl font-black text-slate-300 uppercase mt-0.5">CHAMPION ARENA</h3>
+                <div class="text-xs font-black tracking-widest text-amber-400 uppercase">PEMENANG VOTING ARENA!</div>
+                <h3 class="text-2xl font-black text-slate-300 uppercase mt-0.5">CHAMPION BALAPAN</h3>
 
-                <!-- Winner Avatar Card -->
                 <div class="relative my-4">
                     <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 border-4 border-amber-400 shadow-glow-gold bg-slate-900 overflow-hidden">
                         <img id="winner-photo" src="" alt="Pemenang" class="w-full h-full object-cover rounded-full">
@@ -347,7 +331,6 @@
                     NAMA PEMENANG
                 </h2>
 
-                <!-- Final Stats -->
                 <div class="grid grid-cols-2 gap-3 w-full my-3">
                     <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3">
                         <div class="text-[10px] font-bold text-slate-400 uppercase">Perolehan Vote</div>
@@ -359,7 +342,6 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex items-center gap-3 w-full pt-2">
                     <button onclick="closeModal('winner-modal')" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition">
                         Tutup Tampilan
@@ -375,7 +357,6 @@
     <!-- MODAL 1: EVENT & PARTICIPANT SETTINGS -->
     <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
         <div class="glass-panel w-full max-w-2xl max-h-[90vh] rounded-2xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden">
-            <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
@@ -386,7 +367,6 @@
                 </button>
             </div>
 
-            <!-- Modal Content Scrollable -->
             <div class="p-6 overflow-y-auto space-y-6">
                 <!-- Section A: General Event Setup -->
                 <div class="space-y-4">
@@ -412,7 +392,7 @@
                                 <option value="2">2 Peserta</option>
                                 <option value="3">3 Peserta</option>
                                 <option value="4">4 Peserta</option>
-                                <option value="5">5 Peserta</option>
+                                <option value="5" selected>5 Peserta</option>
                             </select>
                         </div>
                         <div>
@@ -431,19 +411,6 @@
                             </select>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Logo Event</label>
-                        <div class="flex items-center gap-3">
-                            <input type="file" id="setting-event-logo-file" accept="image/*" onchange="handleLogoUpload(event)" class="hidden">
-                            <button type="button" onclick="document.getElementById('setting-event-logo-file').click()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 transition">
-                                Upload Logo Perangkat
-                            </button>
-                            <button type="button" onclick="resetEventLogo()" class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold transition">
-                                Default Logo
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Section B: Participants Form -->
@@ -452,13 +419,10 @@
                         2. Form Data Peserta (Maksimal 5)
                     </h4>
 
-                    <div id="settings-participants-list" class="space-y-4">
-                        <!-- Dynamically Generated Participant Config Forms -->
-                    </div>
+                    <div id="settings-participants-list" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- Modal Footer -->
             <div class="px-6 py-4 border-t border-slate-800 flex items-center justify-end gap-3 bg-slate-900/50">
                 <button onclick="closeModal('settings-modal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider transition">
                     Batal
@@ -478,7 +442,7 @@
             </div>
             <h3 class="text-xl font-extrabold text-white uppercase">Konfirmasi Reset Vote</h3>
             <p class="text-sm text-slate-300">
-                Apakah Anda yakin ingin menghapus seluruh jumlah vote dan mengembalikan timer ke awal?
+                Apakah Anda yakin ingin menghapus seluruh perolehan vote dan mengembalikan timer ke awal?
             </p>
             <div class="flex items-center justify-center gap-3 pt-2">
                 <button onclick="closeModal('reset-modal')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider transition">
@@ -491,7 +455,7 @@
         </div>
     </div>
 
-    <!-- NEW LEADER CELEBRATION TOAST -->
+    <!-- LEADER CELEBRATION TOAST -->
     <div id="leader-toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 transform -translate-y-20 opacity-0 pointer-events-none transition-all duration-500">
         <div class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black shadow-glow-gold flex items-center gap-3 border-2 border-white">
             <i data-lucide="crown" class="w-6 h-6 fill-slate-950"></i>
@@ -510,9 +474,9 @@
                 subtitle: "Live Race Fan Voting Arena",
                 logo: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80",
                 participantCount: 5,
-                theme: "dark",
                 voteIncrement: 100,
-                timerDurationMinutes: 5
+                timerDurationMinutes: 5,
+                mode: "manual" // 'manual' or 'auto'
             },
             participants: [
                 {
@@ -558,16 +522,16 @@
             ]
         };
 
-        // Active State Variables
         let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
         let previousLeaderId = null;
 
-        // Timer State Variables
+        // Timer & Auto Race Interval Handles
         let timerSecondsRemaining = 300;
         let timerInterval = null;
+        let autoRaceInterval = null;
         let isVotingActive = true;
 
-        // Audio Synthesizer Context
+        // Web Audio Synthesizer
         let audioCtx = null;
 
         function initAudio() {
@@ -585,7 +549,7 @@
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -605,20 +569,86 @@
             } catch (e) {}
         }
 
-        // INITIALIZATION
+        // INITIALIZATION ON LOAD
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             startTimer(state.event.timerDurationMinutes * 60);
             renderAll();
+            registerServiceWorker();
         });
 
-        // Main Render Routine
+        // REGISTER SERVICE WORKER FOR OFFLINE PWA
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => console.log('Service Worker Registered'))
+                    .catch(err => console.log('SW Registration failed:', err));
+            }
+        }
+
+        function setRaceMode(mode) {
+            state.event.mode = mode;
+            const btnManual = document.getElementById('btn-mode-manual');
+            const btnAuto = document.getElementById('btn-mode-auto');
+            const badgeAuto = document.getElementById('badge-auto-mode');
+
+            if (mode === 'auto') {
+                btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-cyan-400 bg-slate-800 shadow";
+                btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
+                if (badgeAuto) badgeAuto.classList.remove('hidden');
+                startAutoRaceEngine();
+            } else {
+                btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-emerald-400 bg-slate-800 shadow";
+                btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
+                if (badgeAuto) badgeAuto.classList.add('hidden');
+                stopAutoRaceEngine();
+            }
+        }
+
+        function startAutoRaceEngine() {
+            stopAutoRaceEngine();
+            autoRaceInterval = setInterval(() => {
+                if (!isVotingActive) {
+                    stopAutoRaceEngine();
+                    return;
+                }
+
+                const active = state.participants.slice(0, state.event.participantCount);
+                if (active.length === 0) return;
+
+                // Random selection with lead shift logic
+                const sorted = [...active].sort((a, b) => b.votes - a.votes);
+                let target;
+
+                // 40% chance to boost 2nd or 3rd place to cause dynamic overtakes!
+                if (Math.random() < 0.40 && sorted.length > 1) {
+                    const trailingIdx = Math.floor(Math.random() * (sorted.length - 1)) + 1;
+                    target = sorted[trailingIdx];
+                } else {
+                    target = active[Math.floor(Math.random() * active.length)];
+                }
+
+                const addedVotes = Math.floor(Math.random() * 120) + 30;
+                target.votes += addedVotes;
+
+                playBeep(600 + Math.random() * 400, 0.05, 'sine');
+                renderAll();
+            }, 500);
+        }
+
+        function stopAutoRaceEngine() {
+            if (autoRaceInterval) {
+                clearInterval(autoRaceInterval);
+                autoRaceInterval = null;
+            }
+        }
+
+        // MAIN RENDER ROUTINE
         function renderAll() {
             renderHeader();
             renderRaceTrackArena();
         }
 
-        // Render Header & Totals
         function renderHeader() {
             document.getElementById('display-event-title').innerText = state.event.title;
             document.getElementById('display-event-subtitle').innerText = state.event.subtitle;
@@ -629,9 +659,7 @@
                 .reduce((acc, curr) => acc + curr.votes, 0);
 
             animateNumber('display-total-votes', totalVotes);
-            document.body.className = `bg-cyber-grid min-h-screen text-slate-100 flex flex-col justify-between theme-${state.event.theme} p-2 sm:p-4`;
 
-            // Sync increment dropdowns
             const headerIncrement = document.getElementById('header-vote-increment');
             if (headerIncrement) headerIncrement.value = state.event.voteIncrement;
         }
@@ -640,7 +668,6 @@
             state.event.voteIncrement = parseInt(val) || 100;
         }
 
-        // COUNTDOWN TIMER LOGIC
         function startTimer(seconds) {
             clearInterval(timerInterval);
             timerSecondsRemaining = seconds;
@@ -654,6 +681,7 @@
                 } else {
                     clearInterval(timerInterval);
                     isVotingActive = false;
+                    stopAutoRaceEngine();
                     finishVotingWinner();
                 }
             }, 1000);
@@ -675,7 +703,7 @@
             }
         }
 
-        // Render Race Track Circuit
+        // RENDER AUTO-RANKED RACE TRACK
         function renderRaceTrackArena() {
             const container = document.getElementById('race-lanes-container');
             const activeParticipants = state.participants.slice(0, state.event.participantCount);
@@ -683,11 +711,11 @@
             const totalVotes = activeParticipants.reduce((acc, curr) => acc + curr.votes, 0) || 1;
             const topVotes = Math.max(...activeParticipants.map(p => p.votes), 1);
 
-            // Sort participants by current votes to find leader & ranks
-            const sorted = [...activeParticipants].sort((a, b) => b.votes - a.votes);
+            // AUTO RANK REORDERING: Rank 1 automatically moves to the top lane!
+            const sortedParticipants = [...activeParticipants].sort((a, b) => b.votes - a.votes);
 
-            // Check if leader changed
-            const currentLeader = sorted[0];
+            // Leader Check & Fanfare
+            const currentLeader = sortedParticipants[0];
             if (previousLeaderId && currentLeader && currentLeader.id !== previousLeaderId) {
                 triggerNewLeaderEffect(currentLeader);
             }
@@ -695,43 +723,49 @@
 
             let html = '';
 
-            activeParticipants.forEach((p) => {
+            // Render according to sorted order so #1 is ALWAYS at the TOP
+            sortedParticipants.forEach((p, index) => {
+                const currentRank = index + 1;
                 const pctOfTotal = (p.votes / totalVotes) * 100;
                 const raceProgressPct = Math.min(Math.max((p.votes / topVotes) * 78, 2), 80);
-                
-                const currentRank = sorted.findIndex(item => item.id === p.id) + 1;
-                
-                let rankBadgeBg = 'bg-slate-800 text-slate-200 border-slate-600 hover:bg-slate-700';
-                if (currentRank === 1) rankBadgeBg = 'bg-amber-400 text-slate-950 font-black border-yellow-200 shadow-glow-gold hover:bg-amber-300';
-                else if (currentRank === 2) rankBadgeBg = 'bg-emerald-400 text-slate-950 font-black border-emerald-200 hover:bg-emerald-300';
-                else if (currentRank === 3) rankBadgeBg = 'bg-red-500 text-white font-black border-red-300 hover:bg-red-400';
+
+                let rankBadgeBg = 'bg-slate-800 text-slate-200 border-slate-600';
+                if (currentRank === 1) rankBadgeBg = 'bg-amber-400 text-slate-950 font-black border-yellow-200 shadow-glow-gold';
+                else if (currentRank === 2) rankBadgeBg = 'bg-emerald-400 text-slate-950 font-black border-emerald-200';
+                else if (currentRank === 3) rankBadgeBg = 'bg-red-500 text-white font-black border-red-300';
 
                 html += `
-                    <div class="race-lane h-14 rounded-xl flex items-center relative px-2 overflow-hidden">
+                    <div class="race-lane h-14 rounded-xl flex items-center relative px-2 overflow-hidden shadow-md">
                         
-                        <!-- Left Action: Direct Rank Vote Button & Name -->
+                        <!-- Left Rank Vote Button & Participant Info -->
                         <div class="w-32 sm:w-36 flex items-center gap-2 z-20 flex-shrink-0">
-                            <!-- INTERACTIVE RANK VOTE BUTTON -->
-                            <button type="button" onclick="voteParticipant('${p.id}')" title="Klik untuk tambah +${state.event.voteIncrement} vote!" class="px-2 py-1 rounded-lg flex flex-col items-center justify-center text-xs font-black border transition transform active:scale-90 shadow-md ${rankBadgeBg}">
+                            <button type="button" onclick="voteParticipant('${p.id}')" title="Klik +${state.event.voteIncrement} vote!" class="px-2 py-1 rounded-lg flex flex-col items-center justify-center text-xs font-black border transition transform active:scale-90 ${rankBadgeBg}">
                                 <span class="leading-none">#${currentRank}</span>
                                 <span class="text-[9px] font-mono leading-none opacity-80">+${state.event.voteIncrement}</span>
                             </button>
-
                             <span class="text-xs font-extrabold text-slate-100 truncate uppercase tracking-wider">${p.name}</span>
                         </div>
 
-                        <!-- Track Moving Area -->
+                        <!-- Track Area With Animated Wavy Laser Path -->
                         <div class="relative flex-1 h-full flex items-center mx-2">
-                            <!-- Trail Line -->
-                            <div class="race-trail-line" style="width: calc(${raceProgressPct}% + 12px); background: linear-gradient(90deg, ${p.color}22 0%, ${p.color} 100%); shadow: 0 0 10px ${p.color};"></div>
+                            
+                            <!-- SVG Wavy Trail Path (Ekor Bergelombang) -->
+                            <svg class="absolute left-0 top-0 h-full pointer-events-none z-10" style="width: calc(${raceProgressPct}% + 12px);" preserveAspectRatio="none" viewBox="0 0 500 40">
+                                <defs>
+                                    <linearGradient id="trail-grad-${p.id}" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="${p.color}" stop-opacity="0.1" />
+                                        <stop offset="100%" stop-color="${p.color}" stop-opacity="0.9" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M 0 20 Q 25 5, 50 20 T 100 20 T 150 20 T 200 20 T 250 20 T 300 20 T 350 20 T 400 20 T 450 20 T 500 20" fill="none" stroke="url(#trail-grad-${p.id})" stroke-width="4" class="animated-wavy-path" />
+                            </svg>
 
-                            <!-- ROUND MOVING AVATAR NODE -->
+                            <!-- Moving Avatar Node -->
                             <div class="race-avatar-node flex flex-col items-center" style="left: calc(${raceProgressPct}% + 12px);">
                                 <div class="relative group cursor-pointer" onclick="voteParticipant('${p.id}')">
                                     <div class="w-10 h-10 rounded-full p-0.5 border-2 shadow-lg transition transform group-hover:scale-110 bg-slate-900" style="border-color: ${p.color}; box-shadow: 0 0 12px ${p.color}88;">
                                         <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/100x100/1e293b/ffffff?text=USER'">
                                     </div>
-                                    
                                     <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[9px] font-mono font-bold text-white whitespace-nowrap shadow-md">
                                         ${pctOfTotal.toFixed(1)}%
                                     </div>
@@ -739,7 +773,7 @@
                             </div>
                         </div>
 
-                        <!-- Right Votes Display -->
+                        <!-- Right Votes Counter Display -->
                         <div class="w-16 sm:w-20 text-right z-20 flex-shrink-0">
                             <span class="font-mono font-black text-xs sm:text-sm text-cyan-300">${p.votes.toLocaleString('id-ID')}</span>
                         </div>
@@ -750,7 +784,6 @@
             container.innerHTML = html;
         }
 
-        // DIRECT VOTE ACTION FOR A PARTICIPANT
         function voteParticipant(participantId) {
             if (!isVotingActive) {
                 playBeep(200, 0.2, 'sawtooth');
@@ -764,18 +797,15 @@
             target.votes += amount;
 
             playBeep(880, 0.08, 'sine');
-            setTimeout(() => playBeep(1200, 0.1, 'sine'), 60);
-
             confetti({
-                particleCount: 30,
-                spread: 50,
+                particleCount: 25,
+                spread: 45,
                 origin: { y: 0.7 }
             });
 
             renderAll();
         }
 
-        // ANIMATED NUMBER TICKER
         function animateNumber(elementId, targetValue) {
             const el = document.getElementById(elementId);
             if (!el) return;
@@ -786,35 +816,15 @@
             el.classList.add('number-bump');
             setTimeout(() => el.classList.remove('number-bump'), 300);
 
-            const duration = 600;
-            const startTime = performance.now();
-
-            function update(now) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = 1 - (1 - progress) * (1 - progress);
-                const current = Math.floor(startValue + (targetValue - startValue) * easeProgress);
-
-                el.innerText = current.toLocaleString('id-ID');
-
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                } else {
-                    el.innerText = targetValue.toLocaleString('id-ID');
-                }
-            }
-
-            requestAnimationFrame(update);
+            el.innerText = targetValue.toLocaleString('id-ID');
         }
 
-        // LEADER CHANGE CELEBRATION
         function triggerNewLeaderEffect(leader) {
             const toast = document.getElementById('leader-toast');
             const nameEl = document.getElementById('leader-toast-name');
             nameEl.innerText = leader.name;
 
             playLeaderFanfare();
-
             confetti({
                 particleCount: 100,
                 spread: 90,
@@ -830,9 +840,9 @@
             }, 3000);
         }
 
-        // FINISH & SHOW WINNER SCREEN
         function finishVotingWinner() {
             clearInterval(timerInterval);
+            stopAutoRaceEngine();
             isVotingActive = false;
 
             const activeParticipants = state.participants.slice(0, state.event.participantCount);
@@ -850,7 +860,6 @@
             document.getElementById('winner-percent').innerText = `${pct}%`;
 
             playLeaderFanfare();
-
             confetti({
                 particleCount: 200,
                 spread: 120,
@@ -860,11 +869,9 @@
             openModal('winner-modal');
         }
 
-        // PRESENTATION MODE TOGGLE
         function togglePresentationMode() {
             const controls = document.getElementById('presentation-controls');
             const nav = document.querySelector('header');
-
             const isPresenting = nav.classList.contains('hidden');
 
             if (!isPresenting) {
@@ -876,11 +883,8 @@
             }
         }
 
-        // MODAL HELPERS
         function openModal(modalId) {
-            if (modalId === 'settings-modal') {
-                populateSettingsForm();
-            }
+            if (modalId === 'settings-modal') populateSettingsForm();
             document.getElementById(modalId).classList.remove('hidden');
         }
 
@@ -888,7 +892,6 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // POPULATE SETTINGS FORM
         function populateSettingsForm() {
             document.getElementById('setting-event-title').value = state.event.title;
             document.getElementById('setting-event-subtitle').value = state.event.subtitle;
@@ -908,9 +911,7 @@
                 const p = state.participants[i];
                 html += `
                     <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-emerald-400 uppercase">Peserta #${i + 1}</span>
-                        </div>
+                        <span class="text-xs font-bold text-emerald-400 uppercase">Peserta #${i + 1}</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div class="sm:col-span-2">
                                 <label class="block text-[10px] text-slate-400 font-bold uppercase">Nama Peserta</label>
@@ -921,22 +922,16 @@
                                 <input type="number" id="setting-p-votes-${i}" value="${p.initialVotes}" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Ganti Foto Peserta</label>
-                            <input type="file" accept="image/*" onchange="handleParticipantPhotoUpload(event, ${i})" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700">
-                        </div>
                     </div>
                 `;
             }
-
             container.innerHTML = html;
         }
 
-        function handleParticipantCountChange(val) {
+        function handleParticipantCountChange() {
             renderSettingsParticipantsList();
         }
 
-        // SAVE SETTINGS
         function saveSettings() {
             state.event.title = document.getElementById('setting-event-title').value || "LIVE VOTING";
             state.event.subtitle = document.getElementById('setting-event-subtitle').value || "";
@@ -961,43 +956,11 @@
             renderAll();
         }
 
-        // FILE UPLOAD HANDLERS
-        function handleLogoUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    state.event.logo = e.target.result;
-                    document.getElementById('display-event-logo').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function resetEventLogo() {
-            state.event.logo = DEFAULT_STATE.event.logo;
-            document.getElementById('display-event-logo').src = state.event.logo;
-        }
-
-        function handleParticipantPhotoUpload(event, index) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    state.participants[index].photo = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // RESET CONFIRMATION
         function confirmReset() {
-            state.participants.forEach(p => {
-                p.votes = p.initialVotes;
-            });
+            state.participants.forEach(p => p.votes = p.initialVotes);
             closeModal('reset-modal');
-            playBeep(300, 0.2, 'sawtooth');
             startTimer(state.event.timerDurationMinutes * 60);
+            if (state.event.mode === 'auto') startAutoRaceEngine();
             renderAll();
         }
     </script>
