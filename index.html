@@ -50,6 +50,63 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'live-race-voting-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDemoKeyOnly",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let docRef = null;
+
+        async function initFirebase() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                docRef = doc(db, 'artifacts', appId, 'public', 'data', 'race_session', 'state');
+                
+                onSnapshot(docRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const savedState = snapshot.data();
+                        if (savedState && savedState.participants && savedState.participants.length > 0) {
+                            window.state = savedState;
+                            if (typeof renderAll === 'function') renderAll();
+                        }
+                    } else {
+                        window.saveStateToFirestore();
+                    }
+                }, (error) => console.warn("Firestore sync warning:", error));
+            } catch (err) {
+                console.error("Firebase initialization error:", err);
+            }
+        }
+
+        window.saveStateToFirestore = async function() {
+            if (!docRef || !window.state) return;
+            try {
+                await setDoc(docRef, JSON.parse(JSON.stringify(window.state)));
+            } catch (e) {
+                console.error("Error saving state to cloud database:", e);
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+        });
+    </script>
     
     <style>
         body {
@@ -146,9 +203,9 @@
                 </div>
                 <div>
                     <h1 class="text-base font-extrabold tracking-wider uppercase bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
-                        Live Vote
+                        Live Voting
                     </h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Arena Balapan</span>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Arena Balap</span>
                 </div>
             </div>
 
@@ -222,6 +279,7 @@
                             </p>
                             <span id="badge-auto-mode" class="hidden px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-mono text-[9px] font-bold animate-pulse">
                                 LIVE
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -287,7 +345,9 @@
                 <!-- Dynamic Lanes Shift Automatically -->
             </div>
         </div>
-       
+        
+        
+        </section>
 
     </main>
 
@@ -624,24 +684,25 @@
                 const active = state.participants.slice(0, state.event.participantCount);
                 if (active.length === 0) return;
 
-                // Random selection with lead shift logic
                 const sorted = [...active].sort((a, b) => b.votes - a.votes);
                 let target;
 
-                // 40% chance to boost 2nd or 3rd place to cause dynamic overtakes!
-                if (Math.random() < 0.40 && sorted.length > 1) {
+                // 65% peluang meningkatkan peserta belakang agar tercipta aksi kejar-kejaran dramatis
+                if (Math.random() < 0.65 && sorted.length > 1) {
                     const trailingIdx = Math.floor(Math.random() * (sorted.length - 1)) + 1;
                     target = sorted[trailingIdx];
                 } else {
-                    target = active[Math.floor(Math.random() * active.length)];
+                    target = sorted[0]; // Pemimpin melesat lebih jauh
                 }
 
-                const addedVotes = Math.floor(Math.random() * 120) + 30;
+                // Lonjakan vote lebih besar untuk merenggangkan/mengejar jarak (+300 hingga +900 vote)
+                const addedVotes = Math.floor(Math.random() * 600) + 300;
                 target.votes += addedVotes;
 
                 playBeep(600 + Math.random() * 400, 0.05, 'sine');
                 renderAll();
-            }, 500);
+                if (window.saveStateToFirestore) window.saveStateToFirestore();
+            }, 600);
         }
 
         function stopAutoRaceEngine() {
@@ -718,6 +779,8 @@
             
             const totalVotes = activeParticipants.reduce((acc, curr) => acc + curr.votes, 0) || 1;
             const topVotes = Math.max(...activeParticipants.map(p => p.votes), 1);
+            const minVotes = Math.min(...activeParticipants.map(p => p.votes));
+            const voteRange = Math.max(topVotes - minVotes, 100);
 
             // AUTO RANK REORDERING: Rank 1 automatically moves to the top lane!
             const sortedParticipants = [...activeParticipants].sort((a, b) => b.votes - a.votes);
@@ -735,7 +798,10 @@
             sortedParticipants.forEach((p, index) => {
                 const currentRank = index + 1;
                 const pctOfTotal = (p.votes / totalVotes) * 100;
-                const raceProgressPct = Math.min(Math.max((p.votes / topVotes) * 78, 2), 80);
+                
+                // Formula jarak relatif agar rentang lintasan terlihat jauh & dramatis (5% hingga 78%)
+                const progressRatio = (p.votes - minVotes) / voteRange;
+                const raceProgressPct = Math.min(Math.max(5 + (progressRatio * 73), 4), 78);
 
                 let rankBadgeBg = 'bg-slate-800 text-slate-200 border-slate-600';
                 if (currentRank === 1) rankBadgeBg = 'bg-amber-400 text-slate-950 font-black border-yellow-200 shadow-glow-gold';
@@ -812,6 +878,7 @@
             });
 
             renderAll();
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
 
         function animateNumber(elementId, targetValue) {
@@ -997,6 +1064,7 @@
             closeModal('settings-modal');
             startTimer(state.event.timerDurationMinutes * 60);
             renderAll();
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
 
         function confirmReset() {
@@ -1005,6 +1073,7 @@
             startTimer(state.event.timerDurationMinutes * 60);
             if (state.event.mode === 'auto') startAutoRaceEngine();
             renderAll();
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
     </script>
 </body>
