@@ -1,0 +1,21 @@
+{
+"name": "Live Race Voting Arena",
+"short_name": "Race Voting",
+"description": "Aplikasi Real-Time Balapan Live Voting PWA Offline",
+"start_url": "./index.html",
+"display": "standalone",
+"background_color": "#080c14",
+"theme_color": "#080c14",
+"icons": [
+{
+"src": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=192&h=192&fit=crop",
+"sizes": "192x192",
+"type": "image/jpeg"
+},
+{
+"src": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=512&h=512&fit=crop",
+"sizes": "512x512",
+"type": "image/jpeg"
+}
+]
+}
