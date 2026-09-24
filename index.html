@@ -34,7 +34,7 @@
                     },
                     boxShadow: {
                         'glow-green': '0 0 25px rgba(16, 185, 129, 0.5)',
-                        'glow-gold': '0 0 30px rgba(245, 158, 11, 0.6)',
+                        'glow-gold': '0 0 30px rgba(245, 158, 11, 0.7)',
                         'glow-blue': '0 0 25px rgba(6, 182, 212, 0.5)',
                         'glow-red': '0 0 25px rgba(239, 68, 68, 0.5)'
                     }
@@ -130,41 +130,47 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Animated Re-ranking Smooth Lane Transition */
-        .race-lane-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+        /* Single Unified Race Arena */
+        .single-race-arena {
             position: relative;
+            width: 100%;
+            height: 520px;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0%, rgba(8, 12, 20, 0.98) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.8);
         }
 
-        .race-lane {
-            position: relative;
-            background: rgba(15, 23, 42, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.6s cubic-bezier(0.34, 1.25, 0.64, 1), background-color 0.4s ease;
-            will-change: transform;
+        .track-scrolling-bg {
+            background-image: linear-gradient(0deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 32px, 20% 100%;
+            animation: scrollTrack 1.2s linear infinite;
         }
 
-        /* Avatar Node Smooth Interpolation */
+        @keyframes scrollTrack {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 0 32px, 0 0; }
+        }
+
+        /* PERSISTENT NODE DENGAN TRANSISI PERSIS BERGESER (SMOOTH CROSSOVER SWAP) */
         .race-avatar-node {
             position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            will-change: left;
+            transform: translate(-50%, 50%);
+            /* Smooth cubic-bezier transition untuk pergeseran silang kiri-kanan dan naik-turun */
+            transition: left 0.8s cubic-bezier(0.34, 1.25, 0.64, 1), bottom 0.8s cubic-bezier(0.34, 1.25, 0.64, 1); 
+            will-change: left, bottom;
             z-index: 25;
         }
 
-        /* Animated Wavy Trail Path CSS */
-        .animated-wavy-path {
-            stroke-dasharray: 20 10;
-            animation: waveFlow 1.2s linear infinite;
+        .speed-aura-shadow {
+            animation: pulseAura 1.5s ease-in-out infinite alternate;
         }
 
-        @keyframes waveFlow {
-            0% { stroke-dashoffset: 0; }
-            100% { stroke-dashoffset: -60; }
+        @keyframes pulseAura {
+            0% { opacity: 0.4; transform: scaleY(0.9); }
+            100% { opacity: 0.9; transform: scaleY(1.1); }
         }
 
         .number-bump {
@@ -177,7 +183,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #080c14; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -190,11 +195,77 @@
             from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.6); }
             to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); border-color: rgba(239, 68, 68, 1); }
         }
+
+        /* ANIMASI POPUP NOTIFIKASI LEADER & PARTY POPPER */
+        @keyframes popupBounceIn {
+            0% { transform: scale(0.3) translateY(-60px); opacity: 0; }
+            50% { transform: scale(1.08) translateY(10px); opacity: 1; }
+            70% { transform: scale(0.96) translateY(-5px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes popupBounceOut {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(0.5) translateY(-60px); opacity: 0; }
+        }
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0) rotate(-6deg); }
+            50% { transform: translateY(-12px) rotate(6deg); }
+        }
+
+        @keyframes glowPulseGold {
+            0%, 100% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.6), 0 0 50px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(245, 158, 11, 0.95), 0 0 90px rgba(245, 158, 11, 0.65); }
+        }
+
+        @keyframes shineSweep {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .leader-popup {
+            animation: popupBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        .leader-popup.hide {
+            animation: popupBounceOut 0.4s ease-in forwards;
+        }
+
+        .crown-animated {
+            animation: crownFloat 1.5s ease-in-out infinite;
+        }
+
+        .glow-gold-pulse {
+            animation: glowPulseGold 1.5s ease-in-out infinite;
+        }
+
+        .shine-text {
+            background: linear-gradient(90deg, #fbbf24 0%, #ffffff 25%, #fbbf24 50%, #ffffff 75%, #fbbf24 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineSweep 2s linear infinite;
+        }
+
+        .spark-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkFly 1.5s ease-out forwards;
+        }
+
+        @keyframes sparkFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
     </style>
 </head>
 <body class="bg-cyber-grid min-h-screen text-slate-100 flex flex-col justify-between p-2 sm:p-4">
 
-    <!-- Top Action Navigation Bar -->
     <header class="glass-panel rounded-2xl px-4 py-2.5 shadow-lg mb-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
             <div class="flex items-center gap-2.5">
@@ -203,24 +274,23 @@
                 </div>
                 <div>
                     <h1 class="text-base font-extrabold tracking-wider uppercase bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
-                        Live Voting
+                        Live Race Voting
                     </h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Arena Balap</span>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Voting Resmi Global</span>
                 </div>
             </div>
 
-            <!-- Race Mode Switcher (Manual / Otomatis) -->
+            <!-- Race Mode Switcher -->
             <div class="flex items-center gap-2">
                 <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs">
                     <button id="btn-mode-manual" onclick="setRaceMode('manual')" class="px-3 py-1 rounded-lg font-bold uppercase transition text-emerald-400 bg-slate-800 shadow">
-                        🎮 Manual
+                        OFFLINE
                     </button>
                     <button id="btn-mode-auto" onclick="setRaceMode('auto')" class="px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white">
-                        🤖 Otomatis
+                        LIVE
                     </button>
                 </div>
 
-                <!-- Direct Vote Increment Selector -->
                 <div class="hidden md:flex items-center gap-1 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs">
                     <span class="text-slate-400 font-bold uppercase text-[10px]">Klik Vote:</span>
                     <select id="header-vote-increment" onchange="updateVoteIncrement(this.value)" class="bg-slate-800 text-emerald-400 font-mono font-bold rounded px-1.5 py-0.5 border border-slate-700 focus:outline-none text-xs">
@@ -233,8 +303,7 @@
                     </select>
                 </div>
 
-                <!-- Modal Controls -->
-                <button onclick="togglePresentationMode()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition shadow-md" title="Mode Fullscreen / Presentasi">
+                <button onclick="togglePresentationMode()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition shadow-md" title="Mode Fullscreen">
                     <i data-lucide="tv" class="w-4 h-4 text-cyan-400"></i>
                 </button>
 
@@ -265,7 +334,7 @@
                 
                 <div class="flex items-center gap-3">
                     <div class="relative group">
-                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1 bg-slate-900/90 border border-emerald-500/50 shadow-glow-green flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
+                        <div class="w-20 h-20 sm:w-16 sm:h-16 rounded-xl p-1 bg-slate-900/90 border border-emerald-500/50 shadow-glow-green flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
                             <img id="display-event-logo" src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80" alt="Logo Event" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://placehold.co/200x200/10b981/ffffff?text=EVENT'">
                         </div>
                     </div>
@@ -316,46 +385,45 @@
                 <div class="flex items-center gap-2">
                     <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
                     <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-white">
-                        Live TOP Rangking
+                        LIVE TOP RANKING
                     </h3>
                 </div>
 
                 <div class="hidden sm:flex items-center gap-3 text-[11px] font-bold text-slate-400">
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> #1 Paling Atas</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Lintasan</span>
-            </div>
-        </div>
-
-        <!-- RACE TRACK CONTAINER (Otomatis menyesuaikan tinggi jumlah peserta) -->
-        <div class="relative w-full bg-slate-950/90 rounded-xl p-3 border border-slate-800/80 transition-all duration-300 overflow-hidden">
-            <!-- Grid Lines -->
-            <div class="absolute inset-y-0 left-36 sm:left-40 w-0.5 bg-emerald-500/40 z-10 border-r border-dashed border-emerald-400/60" title="Start Line"></div>
-            <div class="absolute inset-y-0 right-10 w-1 bg-amber-500/50 z-10 border-r-2 border-dashed border-amber-400" title="Finish Line"></div>
-
-            <!-- Distance Grid Markers -->
-            <div class="absolute inset-0 flex justify-between pl-36 sm:pl-40 pr-10 pointer-events-none opacity-15">
-                <div class="h-full border-r border-slate-400"></div>
-                <div class="h-full border-r border-slate-400"></div>
-                <div class="h-full border-r border-slate-400"></div>
-                <div class="h-full border-r border-slate-400"></div>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> #1 Peringkat Tengah (50%)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Silang Pindah Otomatis</span>
+                </div>
             </div>
 
-            <!-- AUTO-RANK SORTED RACE LANES -->
-            <div id="race-lanes-container" class="race-lane-container z-20 py-1">
-                <!-- Dynamic Lanes Shift Automatically -->
+            <div id="single-race-arena" class="single-race-arena track-scrolling-bg">
+                
+                <!-- Finish Line -->
+                <div class="absolute inset-x-3 top-10 h-1 bg-amber-500/60 z-10 border-t-2 border-dashed border-amber-400 flex items-center justify-between px-3" title="Finish Line">
+                    <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/40">FINISH LINE 🏁</span>
+                    <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/40">FINISH LINE 🏁</span>
+                </div>
+
+                <!-- Start Line -->
+                <div class="absolute inset-x-3 bottom-10 h-1 bg-emerald-500/50 z-10 border-b-2 border-dashed border-emerald-400/70 flex items-center justify-between px-3" title="Start Line">
+                    <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-slate-950/90 px-2 py-0.5 rounded border border-emerald-500/40">START</span>
+                    <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-slate-950/90 px-2 py-0.5 rounded border border-emerald-500/40">START</span>
+                </div>
+
+                <!-- Lane Dividers -->
+                <div id="lane-dividers" class="absolute inset-0 flex justify-around pointer-events-none opacity-20"></div>
+
+                <!-- Dynamic Participants Layer (Persistent Nodes) -->
+                <div id="arena-participants-layer" class="absolute inset-0 z-20 pointer-events-auto"></div>
             </div>
-        </div>
-        
-        
+            
         </section>
 
     </main>
 
-    <!-- PRESENTATION MODE EXIT BUTTON -->
     <div id="presentation-controls" class="fixed bottom-6 right-6 z-50 hidden">
         <button onclick="togglePresentationMode()" class="px-5 py-3 rounded-full bg-slate-900/90 text-slate-200 border border-slate-700 shadow-2xl flex items-center gap-2 font-bold text-sm hover:bg-slate-800 hover:text-white transition active:scale-95 backdrop-blur-md">
             <i data-lucide="x" class="w-4 h-4 text-red-400"></i>
-            <span>Kembali</span>
+            <span>Keluar Presentasi</span>
         </button>
     </div>
 
@@ -369,8 +437,8 @@
                     <i data-lucide="crown" class="w-9 h-9 fill-amber-400"></i>
                 </div>
 
-                <div class="text-xs font-black tracking-widest text-amber-400 uppercase">PEMENANG VOTING ARENA!</div>
-                <h3 class="text-2xl font-black text-slate-300 uppercase mt-0.5">CHAMPION BALAPAN</h3>
+                <div class="text-xs font-black tracking-widest text-amber-400 uppercase">PEMENANG VOTING!</div>
+                <h3 class="text-2xl font-black text-slate-300 uppercase mt-0.5">CHAMPION!</h3>
 
                 <div class="relative my-4">
                     <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 border-4 border-amber-400 shadow-glow-gold bg-slate-900 overflow-hidden">
@@ -398,7 +466,7 @@
 
                 <div class="flex items-center gap-3 w-full pt-2">
                     <button onclick="closeModal('winner-modal')" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition">
-                        Tutup Tampilan
+                        Tutup
                     </button>
                     <button onclick="confirmReset(); closeModal('winner-modal');" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20">
                         Ulangi Voting
@@ -408,7 +476,7 @@
         </div>
     </div>
 
-    <!-- MODAL 1: EVENT & PARTICIPANT SETTINGS -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
         <div class="glass-panel w-full max-w-2xl max-h-[90vh] rounded-2xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
@@ -422,7 +490,6 @@
             </div>
 
             <div class="p-6 overflow-y-auto space-y-6">
-                <!-- Section A: General Event Setup -->
                 <div class="space-y-4">
                     <h4 class="text-xs font-extrabold uppercase tracking-widest text-emerald-400 border-b border-slate-800 pb-1">
                         1. Pengaturan Event Utama
@@ -438,33 +505,30 @@
                             <input type="text" id="setting-event-subtitle" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none font-semibold">
                         </div>
                     </div>
-
-                    <!-- Input Logo Event (URL & Unggah Berkas) -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Logo / Banner Event</label>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Logo Event (URL / Unggah)</label>
                         <div class="flex items-center gap-2">
                             <input type="text" id="setting-event-logo" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none font-semibold">
-                            <label class="cursor-pointer px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-bold text-slate-200 flex items-center gap-1.5 shrink-0 transition active:scale-95">
+                            <label class="cursor-pointer px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-bold text-slate-200 flex items-center gap-1.5 shrink-0 transition active:scale-95" title="Unggah Logo">
                                 <i data-lucide="upload" class="w-3.5 h-3.5 text-emerald-400"></i>
                                 <span>Unggah</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'setting-event-logo')">
+                                <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'setting-event-logo', null)">
                             </label>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Jumlah Peserta (1-5)</label>
-                        <select id="setting-participant-count" onchange="renderSettingsParticipantsList()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none font-semibold">
-                            <option value="1">1 Peserta</option>
-                            <option value="2">2 Peserta</option>
-                            <option value="3">3 Peserta</option>
-                            <option value="4">4 Peserta</option>
-                            <option value="5" selected>5 Peserta</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Durasi Timer (Menit)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Jumlah Peserta (1-5)</label>
+                            <select id="setting-participant-count" onchange="renderSettingsParticipantsList()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none font-semibold">
+                                <option value="1">1 Peserta</option>
+                                <option value="2">2 Peserta</option>
+                                <option value="3">3 Peserta</option>
+                                <option value="4">4 Peserta</option>
+                                <option value="5" selected>5 Peserta</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Durasi Timer (Menit)</label>
                             <input type="number" id="setting-timer-duration" min="1" max="120" value="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none font-mono font-semibold">
                         </div>
                         <div>
@@ -478,10 +542,22 @@
                                 <option value="1000">+1.000</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-amber-400 uppercase mb-1 flex items-center gap-1">
+                                <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+                                <span>Interval Salip (Detik)</span>
+                            </label>
+                            <select id="setting-overtake-interval" class="w-full bg-slate-900 border border-amber-500/40 rounded-lg px-3 py-2 text-sm text-amber-300 focus:border-amber-400 focus:outline-none font-semibold">
+                                <option value="0">Nonaktif (Manual)</option>
+                                <option value="10">Setiap 10 Detik</option>
+                                <option value="15" selected>Setiap 15 Detik</option>
+                                <option value="20">Setiap 20 Detik</option>
+                                <option value="30">Setiap 30 Detik</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Section B: Participants Form -->
                 <div class="space-y-4">
                     <h4 class="text-xs font-extrabold uppercase tracking-widest text-emerald-400 border-b border-slate-800 pb-1">
                         2. Form Data Peserta (Maksimal 5)
@@ -502,7 +578,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: RESET CONFIRMATION -->
+    <!-- RESET MODAL -->
     <div id="reset-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-2xl border border-red-500/30 p-6 text-center space-y-4 shadow-2xl">
             <div class="w-14 h-14 rounded-full bg-red-500/20 border border-red-500/50 flex items-center justify-center text-red-400 mx-auto">
@@ -523,28 +599,65 @@
         </div>
     </div>
 
-    <!-- LEADER CELEBRATION TOAST -->
-    <div id="leader-toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 transform -translate-y-20 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black shadow-glow-gold flex items-center gap-3 border-2 border-white">
-            <i data-lucide="crown" class="w-6 h-6 fill-slate-950"></i>
-            <div>
-                <div class="text-[9px] uppercase tracking-widest leading-none font-bold text-slate-900">Pemimpin Baru Balapan!</div>
-                <div id="leader-toast-name" class="text-base uppercase tracking-wider leading-tight">NAMA PESERTA</div>
+    <!-- LEADER CELEBRATION POPUP NOTIFICATION WITH PARTY POPPERS -->
+    <div id="leader-popup-overlay" class="fixed inset-0 z-[60] hidden items-center justify-center pointer-events-none">
+        <div id="leader-popup" class="relative pointer-events-auto">
+            <!-- Spark / Confetti Canvas Layer -->
+            <div id="spark-container" class="absolute inset-0 pointer-events-none"></div>
+
+            <div class="relative px-8 py-6 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border-4 border-amber-400 glow-gold-pulse flex flex-col items-center gap-2 min-w-[320px] sm:min-w-[400px]">
+                
+                <!-- Party Popper & Crown Animation Header -->
+                <div class="crown-animated -mt-12 mb-1 flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg">🎉</div>
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center shadow-2xl border-4 border-white">
+                        <i data-lucide="crown" class="w-12 h-12 text-slate-950 fill-slate-950"></i>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg">🎉</div>
+                </div>
+
+                <div class="text-[12px] font-black uppercase tracking-[0.3em] text-amber-400 mt-1 flex items-center gap-1.5">
+                   
+                </div>
+
+                <!-- NOTIFIKASI POPUP LEADER (Format Contoh: MESSI PERINGKAT #1) -->
+                <div id="leader-popup-title" class="text-2xl sm:text-4xl font-black uppercase tracking-wider shine-text text-center leading-tight">
+                    MESSI PERINGKAT #1
+                </div>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent my-1"></div>
+
+                <div class="flex items-center gap-2 text-amber-300">
+                    <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest">Menyalip Ke Posisi Tengah #1</span>
+                    <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+                </div>
+
+                <div id="leader-popup-votes" class="font-mono font-black text-3xl text-emerald-400 mt-1">
+                    0
+                </div>
+                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Vote Terkumpul</div>
+
+                <!-- Floating Star Ornaments -->
+                <div class="absolute top-3 left-3 text-amber-400 animate-pulse text-xl">✦</div>
+                <div class="absolute top-3 right-3 text-amber-400 animate-pulse text-xl">✦</div>
+                <div class="absolute bottom-3 left-3 text-amber-400 animate-pulse text-xl">✦</div>
+                <div class="absolute bottom-3 right-3 text-amber-400 animate-pulse text-xl">✦</div>
             </div>
         </div>
     </div>
 
     <script>
-        // DEFAULT APPLICATION DATA MODEL
         const DEFAULT_STATE = {
             event: {
                 title: "BALLON D'OR 2026",
-                subtitle: "Live Race Fan Voting Arena",
+                subtitle: "Live Race Fans Voting",
                 logo: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80",
                 participantCount: 5,
                 voteIncrement: 100,
                 timerDurationMinutes: 5,
-                mode: "manual" // 'manual' or 'auto'
+                overtakeInterval: 15,
+                mode: "manual"
             },
             participants: [
                 {
@@ -553,7 +666,8 @@
                     photo: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=150&auto=format&fit=crop&q=80",
                     color: "#f59e0b",
                     votes: 5240,
-                    initialVotes: 5240
+                    initialVotes: 5240,
+                    displayVotes: 5240
                 },
                 {
                     id: "p2",
@@ -561,7 +675,8 @@
                     photo: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=150&auto=format&fit=crop&q=80",
                     color: "#06b6d4",
                     votes: 4820,
-                    initialVotes: 4820
+                    initialVotes: 4820,
+                    displayVotes: 4820
                 },
                 {
                     id: "p3",
@@ -569,7 +684,8 @@
                     photo: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=150&auto=format&fit=crop&q=80",
                     color: "#10b981",
                     votes: 3950,
-                    initialVotes: 3950
+                    initialVotes: 3950,
+                    displayVotes: 3950
                 },
                 {
                     id: "p4",
@@ -577,7 +693,8 @@
                     photo: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=150&auto=format&fit=crop&q=80",
                     color: "#8b5cf6",
                     votes: 2100,
-                    initialVotes: 2100
+                    initialVotes: 2100,
+                    displayVotes: 2100
                 },
                 {
                     id: "p5",
@@ -585,7 +702,8 @@
                     photo: "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=150&auto=format&fit=crop&q=80",
                     color: "#f43f5e",
                     votes: 1400,
-                    initialVotes: 1400
+                    initialVotes: 1400,
+                    displayVotes: 1400
                 }
             ]
         };
@@ -593,65 +711,121 @@
         let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
         let previousLeaderId = null;
 
-        // Timer & Auto Race Interval Handles
         let timerSecondsRemaining = 300;
         let timerInterval = null;
         let autoRaceInterval = null;
+        let overtakeIntervalTimer = null;
+        let animationFrameId = null;
         let isVotingActive = true;
 
-        // Web Audio Synthesizer
         let audioCtx = null;
 
-        function initAudio() {
+        function getAudioContext() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) audioCtx = new AudioContext();
             }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
         }
 
-        function playBeep(freq = 440, duration = 0.08, type = 'sine') {
+        function playBeep(freq = 440, duration = 0.1, type = 'sine') {
             try {
-                initAudio();
-                if (!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
                 osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                gain.connect(ctx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.warn("Audio playback error:", e);
+            }
         }
 
         function playLeaderFanfare() {
             try {
-                initAudio();
-                if (!audioCtx) return;
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, idx) => {
-                    setTimeout(() => playBeep(freq, 0.15, 'triangle'), idx * 90);
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                
+                const notes = [
+                    { freq: 523.25, delay: 0, dur: 0.15 },
+                    { freq: 659.25, delay: 100, dur: 0.15 },
+                    { freq: 783.99, delay: 200, dur: 0.15 },
+                    { freq: 1046.50, delay: 300, dur: 0.3 },
+                    { freq: 1318.51, delay: 500, dur: 0.2 },
+                    { freq: 1046.50, delay: 700, dur: 0.15 },
+                    { freq: 1318.51, delay: 850, dur: 0.5 }
+                ];
+
+                notes.forEach(note => {
+                    setTimeout(() => {
+                        playBeep(note.freq, note.dur, 'triangle');
+                    }, note.delay);
                 });
-            } catch (e) {}
+
+                setTimeout(() => { playBeep(80, 0.3, 'sawtooth'); }, 0);
+                setTimeout(() => { playBeep(80, 0.3, 'sawtooth'); }, 300);
+                setTimeout(() => { playBeep(80, 0.5, 'sawtooth'); }, 850);
+            } catch (e) {
+                console.warn("Fanfare playback error:", e);
+            }
         }
 
-        // INITIALIZATION ON LOAD
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered:', reg.scope))
+                    .catch(err => console.warn('Service Worker Registration Failed:', err));
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             startTimer(state.event.timerDurationMinutes * 60);
+            startOvertakeEngine();
+            startContinuousPhysicsEngine();
             renderAll();
             registerServiceWorker();
         });
 
-        // REGISTER SERVICE WORKER FOR OFFLINE PWA
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(() => console.log('Service Worker Registered'))
-                    .catch(err => console.log('SW Registration failed:', err));
+        function startTimer(seconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            timerSecondsRemaining = seconds;
+            isVotingActive = true;
+
+            function updateTimerDisplay() {
+                const mins = Math.floor(timerSecondsRemaining / 60);
+                const secs = timerSecondsRemaining % 60;
+                const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                
+                const display = document.getElementById('display-countdown-timer');
+                const box = document.getElementById('timer-card-box');
+                if (display) display.innerText = formatted;
+
+                if (timerSecondsRemaining <= 30 && box) {
+                    box.classList.add('timer-warning');
+                } else if (box) {
+                    box.classList.remove('timer-warning');
+                }
+
+                if (timerSecondsRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    finishVotingWinner();
+                } else {
+                    timerSecondsRemaining--;
+                }
             }
+
+            updateTimerDisplay();
+            timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
         function setRaceMode(mode) {
@@ -661,16 +835,24 @@
             const badgeAuto = document.getElementById('badge-auto-mode');
 
             if (mode === 'auto') {
-                btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-cyan-400 bg-slate-800 shadow";
-                btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
+                if (btnAuto) btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-cyan-400 bg-slate-800 shadow";
+                if (btnManual) btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
                 if (badgeAuto) badgeAuto.classList.remove('hidden');
                 startAutoRaceEngine();
             } else {
-                btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-emerald-400 bg-slate-800 shadow";
-                btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
+                if (btnManual) btnManual.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-emerald-400 bg-slate-800 shadow";
+                if (btnAuto) btnAuto.className = "px-3 py-1 rounded-lg font-bold uppercase transition text-slate-400 hover:text-white";
                 if (badgeAuto) badgeAuto.classList.add('hidden');
                 stopAutoRaceEngine();
             }
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
+        }
+
+        function updateVoteIncrement(value) {
+            state.event.voteIncrement = parseInt(value) || 100;
+            const settingInc = document.getElementById('setting-default-increment');
+            if (settingInc) settingInc.value = state.event.voteIncrement;
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
 
         function startAutoRaceEngine() {
@@ -684,25 +866,17 @@
                 const active = state.participants.slice(0, state.event.participantCount);
                 if (active.length === 0) return;
 
-                const sorted = [...active].sort((a, b) => b.votes - a.votes);
-                let target;
-
-                // 65% peluang meningkatkan peserta belakang agar tercipta aksi kejar-kejaran dramatis
-                if (Math.random() < 0.65 && sorted.length > 1) {
-                    const trailingIdx = Math.floor(Math.random() * (sorted.length - 1)) + 1;
-                    target = sorted[trailingIdx];
-                } else {
-                    target = sorted[0]; // Pemimpin melesat lebih jauh
+                const numBoosted = Math.random() < 0.6 ? 2 : 1;
+                for (let b = 0; b < numBoosted; b++) {
+                    const target = active[Math.floor(Math.random() * active.length)];
+                    const gradualAdd = Math.floor(Math.random() * 45) + 10;
+                    target.votes += gradualAdd;
                 }
 
-                // Lonjakan vote lebih besar untuk merenggangkan/mengejar jarak (+300 hingga +900 vote)
-                const addedVotes = Math.floor(Math.random() * 600) + 300;
-                target.votes += addedVotes;
-
-                playBeep(600 + Math.random() * 400, 0.05, 'sine');
-                renderAll();
+                playBeep(600 + Math.random() * 400, 0.03, 'sine');
+                renderHeader();
                 if (window.saveStateToFirestore) window.saveStateToFirestore();
-            }, 600);
+            }, 300);
         }
 
         function stopAutoRaceEngine() {
@@ -712,10 +886,68 @@
             }
         }
 
-        // MAIN RENDER ROUTINE
+        function startOvertakeEngine() {
+            stopOvertakeEngine();
+            const intervalSec = parseInt(state.event.overtakeInterval) || 0;
+            if (intervalSec <= 0) return;
+
+            overtakeIntervalTimer = setInterval(() => {
+                triggerOvertakeDrama();
+            }, intervalSec * 1000);
+        }
+
+        function stopOvertakeEngine() {
+            if (overtakeIntervalTimer) {
+                clearInterval(overtakeIntervalTimer);
+                overtakeIntervalTimer = null;
+            }
+        }
+
+        function triggerOvertakeDrama() {
+            if (!isVotingActive) return;
+
+            const active = state.participants.slice(0, state.event.participantCount);
+            if (active.length < 2) return;
+
+            // Logika dramatisasi salip: Pilih penantang di belakang lalu beri lompatan vote untuk merebut posisi #1
+            const sorted = [...active].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+            const currentLeader = sorted[0];
+
+            const contenders = sorted.slice(1);
+            const challenger = contenders[Math.floor(Math.random() * contenders.length)];
+
+            const leaderVotes = currentLeader.votes || 0;
+            const challengerVotes = challenger.votes || 0;
+            const gap = leaderVotes - challengerVotes;
+            const extraSurge = Math.floor(Math.random() * 250) + (state.event.voteIncrement || 100);
+
+            challenger.votes = challengerVotes + Math.max(gap, 0) + extraSurge;
+
+            playBeep(920, 0.12, 'triangle');
+            renderHeader();
+            if (window.saveStateToFirestore) window.saveStateToFirestore();
+        }
+
+        function startContinuousPhysicsEngine() {
+            function updatePhysics() {
+                const active = state.participants.slice(0, state.event.participantCount);
+                
+                active.forEach((p) => {
+                    if (p.displayVotes === undefined) p.displayVotes = p.votes;
+                    p.displayVotes += (p.votes - p.displayVotes) * 0.06;
+                });
+
+                renderArenaNodes();
+                animationFrameId = requestAnimationFrame(updatePhysics);
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(updatePhysics);
+        }
+
         function renderAll() {
             renderHeader();
-            renderRaceTrackArena();
+            renderArenaNodes();
         }
 
         function renderHeader() {
@@ -725,7 +957,7 @@
 
             const totalVotes = state.participants
                 .slice(0, state.event.participantCount)
-                .reduce((acc, curr) => acc + curr.votes, 0);
+                .reduce((acc, curr) => acc + (curr.votes || 0), 0);
 
             animateNumber('display-total-votes', totalVotes);
 
@@ -733,129 +965,192 @@
             if (headerIncrement) headerIncrement.value = state.event.voteIncrement;
         }
 
-        function updateVoteIncrement(val) {
-            state.event.voteIncrement = parseInt(val) || 100;
-        }
+        function renderArenaNodes() {
+            const container = document.getElementById('arena-participants-layer');
+            const dividersContainer = document.getElementById('lane-dividers');
+            if (!container) return;
 
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            timerSecondsRemaining = seconds;
-            isVotingActive = true;
-            updateTimerDisplay();
-
-            timerInterval = setInterval(() => {
-                if (timerSecondsRemaining > 0) {
-                    timerSecondsRemaining--;
-                    updateTimerDisplay();
-                } else {
-                    clearInterval(timerInterval);
-                    isVotingActive = false;
-                    stopAutoRaceEngine();
-                    finishVotingWinner();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSecondsRemaining / 60);
-            const seconds = timerSecondsRemaining % 60;
-            const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            const timerEl = document.getElementById('display-countdown-timer');
-            const timerBox = document.getElementById('timer-card-box');
-
-            if (timerEl) timerEl.innerText = formatted;
-
-            if (timerSecondsRemaining <= 30 && timerSecondsRemaining > 0) {
-                if (timerBox) timerBox.classList.add('timer-warning');
-            } else if (timerBox) {
-                timerBox.classList.remove('timer-warning');
-            }
-        }
-
-        // RENDER AUTO-RANKED RACE TRACK
-        function renderRaceTrackArena() {
-            const container = document.getElementById('race-lanes-container');
             const activeParticipants = state.participants.slice(0, state.event.participantCount);
+            const totalCount = activeParticipants.length;
+
+            if (dividersContainer && dividersContainer.children.length !== totalCount - 1) {
+                let dividerHtml = '';
+                for (let d = 1; d < totalCount; d++) {
+                    dividerHtml += `<div class="h-full border-r border-cyan-400/20 border-dashed"></div>`;
+                }
+                dividersContainer.innerHTML = dividerHtml;
+            }
             
-            const totalVotes = activeParticipants.reduce((acc, curr) => acc + curr.votes, 0) || 1;
-            const topVotes = Math.max(...activeParticipants.map(p => p.votes), 1);
-            const minVotes = Math.min(...activeParticipants.map(p => p.votes));
+            const totalVotes = activeParticipants.reduce((acc, curr) => acc + (curr.displayVotes || curr.votes), 0) || 1;
+            const topVotes = Math.max(...activeParticipants.map(p => p.displayVotes || p.votes), 1);
+            const minVotes = Math.min(...activeParticipants.map(p => p.displayVotes || p.votes));
             const voteRange = Math.max(topVotes - minVotes, 100);
 
-            // AUTO RANK REORDERING: Rank 1 automatically moves to the top lane!
-            const sortedParticipants = [...activeParticipants].sort((a, b) => b.votes - a.votes);
+            // Sorting peserta berdasarkan vote terbanyak secara real-time
+            const sortedParticipants = [...activeParticipants].sort((a, b) => (b.displayVotes || b.votes) - (a.displayVotes || a.votes));
 
-            // Leader Check & Fanfare
+            // Deteksi pergantian Peringkat #1 untuk Notifikasi Popup Leader & Party Popper
             const currentLeader = sortedParticipants[0];
             if (previousLeaderId && currentLeader && currentLeader.id !== previousLeaderId) {
                 triggerNewLeaderEffect(currentLeader);
             }
             if (currentLeader) previousLeaderId = currentLeader.id;
 
-            let html = '';
+            // MAPPING POSISI Sumbu X berdasarkan Peringkat:
+            // Peringkat 1: Tepat di Tengah (50%)
+            // Peringkat 2 & 3: Di Sisi Kiri Dalam (28%) & Kanan Dalam (72%)
+            // Peringkat 4 & 5: Di Sisi Kiri Luar (14%) & Kanan Luar (86%)
+            const rankXPositions = {
+                1: 50,  // Peringkat 1 -> Center 50%
+                2: 28,  // Peringkat 2 -> Left Inner
+                3: 72,  // Peringkat 3 -> Right Inner
+                4: 14,  // Peringkat 4 -> Left Outer
+                5: 86   // Peringkat 5 -> Right Outer
+            };
 
-            // Render according to sorted order so #1 is ALWAYS at the TOP
-            sortedParticipants.forEach((p, index) => {
-                const currentRank = index + 1;
-                const pctOfTotal = (p.votes / totalVotes) * 100;
+            const activeIds = new Set(activeParticipants.map(p => p.id));
+
+            // Hapus node peserta yang tidak aktif
+            Array.from(container.children).forEach(child => {
+                const childId = child.getAttribute('data-id');
+                if (childId && !activeIds.has(childId)) {
+                    child.remove();
+                }
+            });
+
+            activeParticipants.forEach((p, idx) => {
+                const currentVotes = Math.round(p.displayVotes || p.votes);
+                const rankIdx = sortedParticipants.findIndex(sp => sp.id === p.id) + 1;
+                const pctOfTotal = (currentVotes / totalVotes) * 100;
                 
-                // Formula jarak relatif agar rentang lintasan terlihat jauh & dramatis (5% hingga 78%)
-                const progressRatio = (p.votes - minVotes) / voteRange;
-                const raceProgressPct = Math.min(Math.max(5 + (progressRatio * 73), 4), 78);
+                // Ambil posisi X berdasarkan Peringkat saat ini
+                const posX = rankXPositions[rankIdx] || 50;
 
-                let rankBadgeBg = 'bg-slate-800 text-slate-200 border-slate-600';
-                if (currentRank === 1) rankBadgeBg = 'bg-amber-400 text-slate-950 font-black border-yellow-200 shadow-glow-gold';
-                else if (currentRank === 2) rankBadgeBg = 'bg-emerald-400 text-slate-950 font-black border-emerald-200';
-                else if (currentRank === 3) rankBadgeBg = 'bg-red-500 text-white font-black border-red-300';
+                // Hitung posisi Y (lintasan maju-mundur)
+                const progressRatio = (currentVotes - minVotes) / voteRange;
+                const baseProgress = 12 + (progressRatio * 42) + ((totalCount - rankIdx) * 3);
+                const raceProgressPct = Math.min(Math.max(baseProgress, 12), 75);
 
-                html += `
-                    <div class="race-lane h-14 rounded-xl flex items-center relative px-2 overflow-hidden shadow-md">
+                let node = document.getElementById(`node-${p.id}`);
+
+                // Buat elemen jika belum ada (Persistent Node)
+                if (!node) {
+                    node = document.createElement('div');
+                    node.id = `node-${p.id}`;
+                    node.setAttribute('data-id', p.id);
+                    node.className = 'race-avatar-node flex flex-col items-center';
+                    
+                    node.innerHTML = `
                         
-                        <!-- Left Rank Vote Button & Participant Info -->
-                        <div class="w-32 sm:w-36 flex items-center gap-2 z-20 flex-shrink-0">
-                            <button type="button" onclick="voteParticipant('${p.id}')" title="Klik +${state.event.voteIncrement} vote!" class="px-2 py-1 rounded-lg flex flex-col items-center justify-center text-xs font-black border transition transform active:scale-90 ${rankBadgeBg}">
-                                <span class="leading-none">#${currentRank}</span>
-                                <span class="text-[9px] font-mono leading-none opacity-80">+${state.event.voteIncrement}</span>
-                            </button>
-                            <span class="text-xs font-extrabold text-slate-100 truncate uppercase tracking-wider">${p.name}</span>
-                        </div>
 
-                        <!-- Track Area With Animated Wavy Laser Path -->
-                        <div class="relative flex-1 h-full flex items-center mx-2">
-                            
-                            <!-- SVG Wavy Trail Path (Ekor Bergelombang) -->
-                            <svg class="absolute left-0 top-0 h-full pointer-events-none z-10" style="width: calc(${raceProgressPct}% + 12px);" preserveAspectRatio="none" viewBox="0 0 500 40">
-                                <defs>
-                                    <linearGradient id="trail-grad-${p.id}" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stop-color="${p.color}" stop-opacity="0.1" />
-                                        <stop offset="100%" stop-color="${p.color}" stop-opacity="0.9" />
-                                    </linearGradient>
-                                </defs>
-                                <path d="M 0 20 Q 25 5, 50 20 T 100 20 T 150 20 T 200 20 T 250 20 T 300 20 T 350 20 T 400 20 T 450 20 T 500 20" fill="none" stroke="url(#trail-grad-${p.id})" stroke-width="4" class="animated-wavy-path" />
-                            </svg>
-
-                            <!-- Moving Avatar Node -->
-                            <div class="race-avatar-node flex flex-col items-center" style="left: calc(${raceProgressPct}% + 12px);">
-                                <div class="relative group cursor-pointer" onclick="voteParticipant('${p.id}')">
-                                    <div class="w-10 h-10 rounded-full p-0.5 border-2 shadow-lg transition transform group-hover:scale-110 bg-slate-900" style="border-color: ${p.color}; box-shadow: 0 0 12px ${p.color}88;">
-                                        <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/100x100/1e293b/ffffff?text=USER'">
-                                    </div>
-                                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[9px] font-mono font-bold text-white whitespace-nowrap shadow-md">
-                                        ${pctOfTotal.toFixed(1)}%
-                                    </div>
-                                </div>
+                            <div class="node-name-label px-2 py-0.5 rounded-md bg-slate-900/95 border border-slate-700/80 text-[10px] font-black text-white whitespace-nowrap shadow-lg tracking-tight uppercase max-w-[110px] truncate text-center">
+                                ${p.name}
                             </div>
                         </div>
 
-                        <!-- Right Votes Counter Display -->
-                        <div class="w-16 sm:w-20 text-right z-20 flex-shrink-0">
-                            <span class="font-mono font-black text-xs sm:text-sm text-cyan-300">${p.votes.toLocaleString('id-ID')}</span>
-                        </div>
-                    </div>
-                `;
-            });
+                        <div class="relative group cursor-pointer z-20" onclick="voteParticipant('${p.id}')">
+                            <!-- BADGE PERINGKAT MENEMPEL LANGSUNG PADA GAMBAR AVATAR -->
+                            <div class="photo-rank-badge absolute -top-2 -right-2 z-30 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shadow-lg border-2 bg-amber-400 text-slate-950 border-yellow-200 shadow-glow-gold transition-all duration-300">
+                                #${rankIdx}
+                            </div>
 
-            container.innerHTML = html;
+                            <div class="avatar-photo-box w-12 h-12 sm:w-16 sm:h-16 rounded-full p-0.5 border-2 shadow-2xl transition transform group-hover:scale-110 bg-slate-900 overflow-hidden" style="border-color: ${p.color};">
+                                <img src="${p.photo}" alt="${p.name}" class="node-photo-img w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/100x100/1e293b/ffffff?text=USER'">
+                            </div>
+                        </div>
+
+                        <div class="relative w-10 h-28 pointer-events-none z-10 -mt-3 flex justify-center">
+                            <div class="absolute inset-x-2 top-0 bottom-0 rounded-full blur-sm opacity-60 speed-aura-shadow animate-pulse" style="background: linear-gradient(180deg, ${p.color} 0%, transparent 100%);"></div>
+                            <svg class="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 30 120">
+                                <defs>
+                                    <linearGradient id="trail-grad-${p.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="${p.color}" stop-opacity="0.95" />
+                                        <stop offset="50%" stop-color="${p.color}" stop-opacity="0.4" />
+                                        <stop offset="100%" stop-color="${p.color}" stop-opacity="0.0" />
+                                    </linearGradient>
+                                </defs>
+                                <path fill="none" stroke="url(#trail-grad-${p.id})" stroke-width="6" stroke-linecap="round">
+                                    <animate 
+                                        attributeName="d" 
+                                        dur="2s" 
+                                        repeatCount="indefinite" 
+                                        values="
+                                            M 15 0 Q 22 30, 15 60 T 15 120;
+                                            M 15 0 Q 8 30, 15 60 T 15 120;
+                                            M 15 0 Q 22 30, 15 60 T 15 120
+                                        " 
+                                        calcMode="spline"
+                                        keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
+                                        keyTimes="0; 0.5; 1"
+                                    />
+                                </path>
+                            </svg>
+                        </div>
+
+                        <div class="mt-0.5 px-2 py-0.5 rounded-md bg-slate-950/90 border border-slate-800 text-center z-20 shadow-md">
+                            <div class="node-vote-value font-mono font-black text-[11px] text-cyan-300 leading-none">${currentVotes.toLocaleString('id-ID')}</div>
+                            <div class="node-pct-value text-[8px] font-mono font-bold text-slate-400 leading-none mt-0.5">${pctOfTotal.toFixed(1)}%</div>
+                        </div>
+                    `;
+
+                    container.appendChild(node);
+                }
+
+                // UPDATE POSISI STYLES -> MENYEBABKAN EFEK SLIDING / BERGESER HALUS (CROSSOVER MOTION)
+                node.style.left = `${posX}%`;
+                node.style.bottom = `${raceProgressPct}%`;
+                node.style.zIndex = 35 - rankIdx;
+
+                // Update data dinamis dalam node
+                const photoBadge = node.querySelector('.photo-rank-badge');
+                if (photoBadge) {
+                    photoBadge.innerText = `#${rankIdx}`;
+                    if (rankIdx === 1) {
+                        photoBadge.className = "photo-rank-badge absolute -top-2 -right-2 z-30 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-black shadow-lg border-2 bg-amber-400 text-slate-950 border-yellow-200 shadow-glow-gold scale-110 animate-bounce";
+                    } else if (rankIdx === 2) {
+                        photoBadge.className = "photo-rank-badge absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shadow-md border bg-slate-300 text-slate-950 border-white";
+                    } else if (rankIdx === 3) {
+                        photoBadge.className = "photo-rank-badge absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shadow-md border bg-amber-700 text-white border-amber-500";
+                    } else {
+                        photoBadge.className = "photo-rank-badge absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shadow-md border bg-slate-800 text-slate-300 border-slate-600";
+                    }
+                }
+
+                const btnRankBadge = node.querySelector('.btn-rank-badge');
+                if (btnRankBadge) btnRankBadge.innerText = `#${rankIdx}`;
+
+                const btnTrigger = node.querySelector('.btn-vote-trigger');
+                if (btnTrigger) {
+                    if (rankIdx === 1) {
+                        btnTrigger.className = "btn-vote-trigger px-2.5 py-0.5 rounded-md flex items-center gap-1 text-[10px] font-black border transition transform active:scale-95 shadow-md bg-amber-400 text-slate-950 border-yellow-200 shadow-glow-gold";
+                    } else {
+                        btnTrigger.className = "btn-vote-trigger px-2.5 py-0.5 rounded-md flex items-center gap-1 text-[10px] font-black border transition transform active:scale-95 shadow-md bg-slate-800 text-slate-200 border-slate-600";
+                    }
+                }
+
+                const nameLabel = node.querySelector('.node-name-label');
+                if (nameLabel) nameLabel.innerText = p.name;
+
+                const photoImg = node.querySelector('.node-photo-img');
+                if (photoImg && photoImg.src !== p.photo) photoImg.src = p.photo;
+
+                const avatarBox = node.querySelector('.avatar-photo-box');
+                if (avatarBox) {
+                    if (rankIdx === 1) {
+                        avatarBox.style.borderColor = '#f59e0b';
+                        avatarBox.style.boxShadow = '0 0 25px #f59e0b, 0 0 45px rgba(245, 158, 11, 0.5)';
+                    } else {
+                        avatarBox.style.borderColor = p.color;
+                        avatarBox.style.boxShadow = `0 0 15px ${p.color}aa`;
+                    }
+                }
+
+                const voteVal = node.querySelector('.node-vote-value');
+                if (voteVal) voteVal.innerText = currentVotes.toLocaleString('id-ID');
+
+                const pctVal = node.querySelector('.node-pct-value');
+                if (pctVal) pctVal.innerText = `${pctOfTotal.toFixed(1)}%`;
+            });
         }
 
         function voteParticipant(participantId) {
@@ -877,7 +1172,7 @@
                 origin: { y: 0.7 }
             });
 
-            renderAll();
+            renderHeader();
             if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
 
@@ -895,29 +1190,123 @@
         }
 
         function triggerNewLeaderEffect(leader) {
-            const toast = document.getElementById('leader-toast');
-            const nameEl = document.getElementById('leader-toast-name');
-            nameEl.innerText = leader.name;
+            // Format Teks Notifikasi Popup Contoh: "MESSI PERINGKAT #1"
+            const popupTitleEl = document.getElementById('leader-popup-title');
+            if (popupTitleEl) {
+                popupTitleEl.innerText = `${leader.name.toUpperCase()} PERINGKAT #1`;
+            }
 
+            document.getElementById('leader-popup-votes').innerText = Math.round(leader.votes).toLocaleString('id-ID');
+
+            // Tampilkan overlay & popup
+            const overlay = document.getElementById('leader-popup-overlay');
+            const popup = document.getElementById('leader-popup');
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            popup.classList.remove('hide');
+            popup.classList.remove('leader-popup');
+            void popup.offsetWidth;
+            popup.classList.add('leader-popup');
+
+            // Mainkan Efek Suara Fanfare Pesta
             playLeaderFanfare();
+
+            // PARTY POPPER INTERAKTIF BERTABUR WARNA-WARNI
+            const colors = ['#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444', '#fde047', '#ffffff'];
+            
+            // Ledakan 1: Party Popper Tengah
             confetti({
-                particleCount: 100,
-                spread: 90,
-                origin: { y: 0.4 }
+                particleCount: 140,
+                spread: 110,
+                origin: { x: 0.5, y: 0.5 },
+                colors: colors,
+                scalar: 1.3
             });
 
-            toast.classList.remove('-translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
+            // Ledakan 2: Party Popper Kiri Bawah
             setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-20', 'opacity-0');
-            }, 3000);
+                confetti({
+                    particleCount: 90,
+                    angle: 55,
+                    spread: 80,
+                    origin: { x: 0.05, y: 0.8 },
+                    colors: colors
+                });
+            }, 150);
+
+            // Ledakan 3: Party Popper Kanan Bawah
+            setTimeout(() => {
+                confetti({
+                    particleCount: 90,
+                    angle: 125,
+                    spread: 80,
+                    origin: { x: 0.95, y: 0.8 },
+                    colors: colors
+                });
+            }, 300);
+
+            // Ledakan 4: Hujan Bintang Emas dari Atas
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 180,
+                    origin: { x: 0.5, y: 0.1 },
+                    colors: ['#fbbf24', '#fde047', '#ffffff'],
+                    shapes: ['star', 'circle'],
+                    scalar: 1.4,
+                    gravity: 0.7
+                });
+            }, 500);
+
+            createSparkParticles();
+
+            // Sembunyikan otomatis setelah 4 detik
+            setTimeout(() => {
+                popup.classList.add('hide');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }, 400);
+            }, 4000);
+        }
+
+        function createSparkParticles() {
+            const container = document.getElementById('spark-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#10b981', '#06b6d4', '#8b5cf6', '#ec4899'];
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark-particle';
+                
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const distance = 100 + Math.random() * 80;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                spark.style.setProperty('--tx', `${tx}px`);
+                spark.style.setProperty('--ty', `${ty}px`);
+                spark.style.left = '50%';
+                spark.style.top = '50%';
+                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+                spark.style.boxShadow = `0 0 10px currentColor`;
+                spark.style.animationDelay = `${Math.random() * 0.3}s`;
+
+                container.appendChild(spark);
+            }
+
+            setTimeout(() => { container.innerHTML = ''; }, 2000);
         }
 
         function finishVotingWinner() {
             clearInterval(timerInterval);
             stopAutoRaceEngine();
+            stopOvertakeEngine();
             isVotingActive = false;
 
             const activeParticipants = state.participants.slice(0, state.event.participantCount);
@@ -968,12 +1357,26 @@
         }
 
         function populateSettingsForm() {
-            document.getElementById('setting-event-title').value = state.event.title;
-            document.getElementById('setting-event-subtitle').value = state.event.subtitle;
-            document.getElementById('setting-event-logo').value = state.event.logo || '';
-            document.getElementById('setting-participant-count').value = state.event.participantCount;
-            document.getElementById('setting-timer-duration').value = state.event.timerDurationMinutes;
-            document.getElementById('setting-default-increment').value = state.event.voteIncrement;
+            const titleEl = document.getElementById('setting-event-title');
+            if (titleEl) titleEl.value = state.event.title || '';
+
+            const subEl = document.getElementById('setting-event-subtitle');
+            if (subEl) subEl.value = state.event.subtitle || '';
+
+            const logoEl = document.getElementById('setting-event-logo');
+            if (logoEl) logoEl.value = state.event.logo || '';
+
+            const countEl = document.getElementById('setting-participant-count');
+            if (countEl) countEl.value = state.event.participantCount;
+
+            const timerEl = document.getElementById('setting-timer-duration');
+            if (timerEl) timerEl.value = state.event.timerDurationMinutes;
+
+            const incEl = document.getElementById('setting-default-increment');
+            if (incEl) incEl.value = state.event.voteIncrement;
+
+            const overtakeSelect = document.getElementById('setting-overtake-interval');
+            if (overtakeSelect) overtakeSelect.value = state.event.overtakeInterval !== undefined ? state.event.overtakeInterval : 15;
 
             renderSettingsParticipantsList();
         }
@@ -1007,7 +1410,7 @@
                             <label class="block text-[10px] text-slate-400 font-bold uppercase mb-0.5">Foto / Avatar Peserta</label>
                             <div class="flex items-center gap-1.5">
                                 <input type="text" id="setting-p-photo-${i}" value="${p.photo}" placeholder="https://..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" onchange="document.getElementById('preview-p-photo-${i}').src=this.value">
-                                <label class="cursor-pointer px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] font-bold text-slate-200 flex items-center gap-1 shrink-0 transition active:scale-95" title="Unggah Foto dari Perangkat">
+                                <label class="cursor-pointer px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] font-bold text-slate-200 flex items-center gap-1 shrink-0 transition active:scale-95" title="Unggah Foto">
                                     <i data-lucide="upload" class="w-3 h-3 text-emerald-400"></i>
                                     <span>Unggah</span>
                                     <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'setting-p-photo-${i}', 'preview-p-photo-${i}')">
@@ -1021,7 +1424,6 @@
             lucide.createIcons();
         }
 
-        // Helper untuk memproses file upload lokal ke Data URL
         function handleFileUpload(event, targetInputId, previewImgId) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1040,12 +1442,26 @@
         }
 
         function saveSettings() {
-            state.event.title = document.getElementById('setting-event-title').value || "LIVE VOTING";
-            state.event.subtitle = document.getElementById('setting-event-subtitle').value || "";
-            state.event.logo = document.getElementById('setting-event-logo').value || DEFAULT_STATE.event.logo;
-            state.event.participantCount = parseInt(document.getElementById('setting-participant-count').value) || 5;
-            state.event.timerDurationMinutes = parseInt(document.getElementById('setting-timer-duration').value) || 5;
-            state.event.voteIncrement = parseInt(document.getElementById('setting-default-increment').value) || 100;
+            const titleEl = document.getElementById('setting-event-title');
+            if (titleEl) state.event.title = titleEl.value || "LIVE VOTING";
+
+            const subEl = document.getElementById('setting-event-subtitle');
+            if (subEl) state.event.subtitle = subEl.value || "";
+
+            const logoEl = document.getElementById('setting-event-logo');
+            if (logoEl) state.event.logo = logoEl.value || DEFAULT_STATE.event.logo;
+
+            const countEl = document.getElementById('setting-participant-count');
+            if (countEl) state.event.participantCount = parseInt(countEl.value) || 5;
+
+            const timerEl = document.getElementById('setting-timer-duration');
+            if (timerEl) state.event.timerDurationMinutes = parseInt(timerEl.value) || 5;
+
+            const incEl = document.getElementById('setting-default-increment');
+            if (incEl) state.event.voteIncrement = parseInt(incEl.value) || 100;
+
+            const overtakeSelect = document.getElementById('setting-overtake-interval');
+            if (overtakeSelect) state.event.overtakeInterval = parseInt(overtakeSelect.value) || 0;
 
             for (let i = 0; i < state.event.participantCount; i++) {
                 const nameInput = document.getElementById(`setting-p-name-${i}`);
@@ -1063,6 +1479,7 @@
 
             closeModal('settings-modal');
             startTimer(state.event.timerDurationMinutes * 60);
+            startOvertakeEngine();
             renderAll();
             if (window.saveStateToFirestore) window.saveStateToFirestore();
         }
@@ -1071,6 +1488,7 @@
             state.participants.forEach(p => p.votes = p.initialVotes);
             closeModal('reset-modal');
             startTimer(state.event.timerDurationMinutes * 60);
+            startOvertakeEngine();
             if (state.event.mode === 'auto') startAutoRaceEngine();
             renderAll();
             if (window.saveStateToFirestore) window.saveStateToFirestore();
