@@ -326,58 +326,63 @@
 
     <main class="max-w-7xl w-full mx-auto flex-grow flex flex-col gap-3 justify-center">
 
-        <!-- COMPACT HEADER EVENT BANNER -->
-        <section class="glass-panel rounded-2xl p-3 text-center relative overflow-hidden shadow-xl border border-slate-700/60">
-            <div class="absolute -top-16 -left-16 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+       <!-- COMPACT HEADER EVENT BANNER -->
+<section class="glass-panel rounded-2xl p-1 text-center relative overflow-hidden shadow-xl border border-slate-700/60">
+    <div class="absolute -top-16 -left-16 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-3 px-2">
-                
-                <div class="flex items-center gap-3">
-                    <div class="relative group">
-                        <div class="w-20 h-20 sm:w-16 sm:h-16 rounded-xl p-1 bg-slate-900/90 border border-emerald-500/50 shadow-glow-green flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
-                            <img id="display-event-logo" src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80" alt="Logo Event" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://placehold.co/200x200/10b981/ffffff?text=EVENT'">
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <h2 id="display-event-title" class="text-xl sm:text-3xl font-black tracking-tight text-white uppercase leading-tight drop-shadow-md">
-                            BALLON D'OR 2026
-                        </h2>
-                        <div class="flex items-center gap-2">
-                            <p id="display-event-subtitle" class="text-[11px] sm:text-xs font-semibold text-emerald-400 tracking-widest uppercase">
-                                Live Race Fan Voting Arena
-                            </p>
-                            <span id="badge-auto-mode" class="hidden px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-mono text-[9px] font-bold animate-pulse">
-                                LIVE
-                            </span>
-                        </div>
-                    </div>
+    <div class="relative z-10 flex flex-col items-center justify-center gap-4 px-2">
+        
+        <!-- Logo Event & Judul di Tengah -->
+        <div class="flex flex-col items-center text-center gap-2">
+            <!-- Logo Event di Tengah -->
+            <div class="relative group">
+                <div class="w-52 h-32 sm:w-32 sm:h-32 rounded-xl p-1 bg-slate-900/90 border border-emerald-500/50 shadow-glow-green flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
+                    <img id="display-event-logo" src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80" alt="Logo Event" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://placehold.co/200x200/10b981/ffffff?text=EVENT'">
                 </div>
-
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <div id="timer-card-box" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-900/90 border border-cyan-500/40 flex items-center gap-2 shadow-inner transition-all">
-                        <i data-lucide="timer" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
-                        <div class="text-left">
-                            <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">SISA WAKTU:</div>
-                            <div id="display-countdown-timer" class="text-lg sm:text-2xl font-black font-mono text-cyan-300 leading-none tracking-wider">
-                                05:00
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 flex items-center gap-2 shadow-inner">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                        <div class="text-left">
-                            <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">TOTAL VOTE ARENA:</div>
-                            <div id="display-total-votes" class="text-lg sm:text-2xl font-black font-mono text-emerald-300 leading-none tracking-wider">
-                                0
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </section>
+            
+            <!-- Tulisan Tepat di Bawah Logo -->
+            <div class="flex flex-col items-center text-center">
+                <h2 id="display-event-title" class="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase leading-tight drop-shadow-md">
+                    BALLON D'OR 2026
+                </h2>
+                <div class="flex items-center justify-center gap-2 mt-1">
+                    <p id="display-event-subtitle" class="text-xs sm:text-sm font-semibold text-emerald-400 tracking-widest uppercase">
+                        Live Race Fan Voting Arena
+                    </p>
+                    <span id="badge-auto-mode" class="hidden px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-mono text-[9px] font-bold animate-pulse">
+                        LIVE
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer & Total Vote Info -->
+        <div class="flex items-center justify-center gap-3 sm:gap-4 w-full">
+            <div id="timer-card-box" class="px-4 py-2 rounded-xl bg-slate-900/90 border border-cyan-500/40 flex items-center gap-2 shadow-inner transition-all">
+                <i data-lucide="timer" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
+                <div class="text-left">
+                    <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">SISA WAKTU:</div>
+                    <div id="display-countdown-timer" class="text-lg sm:text-2xl font-black font-mono text-cyan-300 leading-none tracking-wider">
+                        05:00
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 flex items-center gap-2 shadow-inner">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <div class="text-left">
+                    <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">TOTAL VOTE:</div>
+                    <div id="display-total-votes" class="text-lg sm:text-2xl font-black font-mono text-emerald-300 leading-none tracking-wider">
+                        0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 
         <!-- LIVE RACE TRACK ARENA -->
         <section class="glass-panel rounded-2xl p-4 border border-slate-700/80 shadow-2xl overflow-hidden relative">
@@ -424,7 +429,7 @@
     <div id="presentation-controls" class="fixed bottom-6 right-6 z-50 hidden">
         <button onclick="togglePresentationMode()" class="px-5 py-3 rounded-full bg-slate-900/90 text-slate-200 border border-slate-700 shadow-2xl flex items-center gap-2 font-bold text-sm hover:bg-slate-800 hover:text-white transition active:scale-95 backdrop-blur-md">
             <i data-lucide="x" class="w-4 h-4 text-red-400"></i>
-            <span>close</span>
+            <span></span>
         </button>
     </div>
 
@@ -610,17 +615,15 @@
                 
                 <!-- Party Popper & Crown Animation Header -->
                 <div class="crown-animated -mt-12 mb-1 flex items-center gap-2">
-                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg">🎉</div>
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg"></div>
                     <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center shadow-2xl border-4 border-white">
                         <i data-lucide="crown" class="w-12 h-12 text-slate-950 fill-slate-950"></i>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg">🎉</div>
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg"></div>
                 </div>
 
                 <div class="text-[12px] font-black uppercase tracking-[0.3em] text-amber-400 mt-1 flex items-center gap-1.5">
-                    <span>🎉</span>
-                    <span>TAHTA PERINGKAT UTAMA</span>
-                    <span>🎉</span>
+                    
                 </div>
 
                 <!-- NOTIFIKASI POPUP LEADER (Format Contoh: MESSI PERINGKAT #1) -->
@@ -631,9 +634,9 @@
                 <div class="w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent my-1"></div>
 
                 <div class="flex items-center gap-2 text-amber-300">
-                    <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest">Menyalip Ke Posisi Tengah #1</span>
-                    <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+                    <i data-lucide="" class="w-4 h-4 text-orange-400"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest">Menyalip pringkat #1</span>
+                    <i data-lucide="" class="w-4 h-4 text-orange-400"></i>
                 </div>
 
                 <div id="leader-popup-votes" class="font-mono font-black text-3xl text-emerald-400 mt-1">
@@ -654,7 +657,7 @@
         const DEFAULT_STATE = {
             event: {
                 title: "BALLON D'OR 2026",
-                subtitle: "Live Race Fans Voting",
+                subtitle: "",
                 logo: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&auto=format&fit=crop&q=80",
                 participantCount: 5,
                 voteIncrement: 100,
